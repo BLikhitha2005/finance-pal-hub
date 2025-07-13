@@ -1,4 +1,3 @@
-
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -33,7 +32,16 @@ import { Textarea } from "@/components/ui/textarea"
 import { Plus, Search, Filter, Download, Edit, Trash2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
-const allTransactions = [
+type Transaction = {
+  id: number
+  date: string
+  description: string
+  category: string
+  amount: number
+  type: "income" | "expense"
+}
+
+const allTransactions: Transaction[] = [
   { id: 1, date: "2024-07-12", description: "Whole Foods Market", category: "Food", amount: -125.50, type: "expense" },
   { id: 2, date: "2024-07-12", description: "Coffee Shop", category: "Food", amount: -4.75, type: "expense" },
   { id: 3, date: "2024-07-11", description: "Monthly Salary", category: "Salary", amount: 4500.00, type: "income" },
@@ -49,13 +57,13 @@ const allTransactions = [
 const categories = ["All", "Food", "Transport", "Housing", "Utilities", "Entertainment", "Shopping", "Salary", "Freelance"]
 
 export function Transactions() {
-  const [transactions, setTransactions] = useState(allTransactions)
+  const [transactions, setTransactions] = useState<Transaction[]>(allTransactions)
   const [selectedCategory, setSelectedCategory] = useState("All")
   const [searchTerm, setSearchTerm] = useState("")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [editingTransaction, setEditingTransaction] = useState<any>(null)
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
   const [deletingTransactionId, setDeletingTransactionId] = useState<number | null>(null)
   const [editForm, setEditForm] = useState({
     amount: "",
@@ -86,7 +94,8 @@ export function Transactions() {
     return colors[category as keyof typeof colors] || "bg-gray-100 text-gray-800"
   }
 
-  const handleEditClick = (transaction: any) => {
+  const handleEditClick = (transaction: Transaction) => {
+    console.log("Edit clicked for transaction:", transaction)
     setEditingTransaction(transaction)
     setEditForm({
       amount: Math.abs(transaction.amount).toString(),
@@ -101,7 +110,9 @@ export function Transactions() {
   const handleEditSubmit = () => {
     if (!editingTransaction) return
 
-    const updatedTransaction = {
+    console.log("Submitting edit for transaction:", editingTransaction.id)
+    
+    const updatedTransaction: Transaction = {
       ...editingTransaction,
       amount: editingTransaction.type === 'expense' ? -Math.abs(parseFloat(editForm.amount)) : Math.abs(parseFloat(editForm.amount)),
       description: editForm.description,
@@ -109,9 +120,11 @@ export function Transactions() {
       date: editForm.date,
     }
 
-    setTransactions(transactions.map(t => 
-      t.id === editingTransaction.id ? updatedTransaction : t
-    ))
+    setTransactions(prevTransactions => 
+      prevTransactions.map(t => 
+        t.id === editingTransaction.id ? updatedTransaction : t
+      )
+    )
 
     toast({
       title: "Transaction Updated",
@@ -124,13 +137,19 @@ export function Transactions() {
   }
 
   const handleDeleteClick = (transactionId: number) => {
+    console.log("Delete clicked for transaction:", transactionId)
     setDeletingTransactionId(transactionId)
     setIsDeleteDialogOpen(true)
   }
 
   const handleDeleteConfirm = () => {
     if (deletingTransactionId) {
-      setTransactions(transactions.filter(t => t.id !== deletingTransactionId))
+      console.log("Confirming delete for transaction:", deletingTransactionId)
+      
+      setTransactions(prevTransactions => 
+        prevTransactions.filter(t => t.id !== deletingTransactionId)
+      )
+      
       toast({
         title: "Transaction Deleted",
         description: "The transaction has been successfully deleted.",
@@ -139,6 +158,19 @@ export function Transactions() {
     }
     setIsDeleteDialogOpen(false)
     setDeletingTransactionId(null)
+  }
+
+  const handleCancelDelete = () => {
+    console.log("Cancel delete")
+    setIsDeleteDialogOpen(false)
+    setDeletingTransactionId(null)
+  }
+
+  const handleCancelEdit = () => {
+    console.log("Cancel edit")
+    setIsEditDialogOpen(false)
+    setEditingTransaction(null)
+    setEditForm({ amount: "", description: "", category: "", date: "", notes: "" })
   }
 
   return (
@@ -259,7 +291,7 @@ export function Transactions() {
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={handleCancelEdit}>Cancel</Button>
             <Button onClick={handleEditSubmit}>Update Transaction</Button>
           </div>
         </DialogContent>
@@ -275,7 +307,7 @@ export function Transactions() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={handleCancelDelete}>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteConfirm}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
