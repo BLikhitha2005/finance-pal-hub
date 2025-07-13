@@ -41,7 +41,7 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ isDark, toggleTheme }: AppSidebarProps) {
-  const { collapsed } = useSidebar()
+  const { state } = useSidebar()
   const location = useLocation()
   const currentPath = location.pathname
 
@@ -49,10 +49,12 @@ export function AppSidebar({ isDark, toggleTheme }: AppSidebarProps) {
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive ? "bg-primary/10 text-primary font-medium border-r-2 border-primary" : "hover:bg-muted/50"
 
+  const isCollapsed = state === "collapsed"
+
   return (
-    <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible>
+    <Sidebar className={isCollapsed ? "w-14" : "w-64"} collapsible="icon">
       <SidebarHeader className="p-4">
-        {!collapsed && (
+        {!isCollapsed && (
           <div className="flex items-center gap-2">
             <PieChart className="h-8 w-8 text-primary" />
             <div>
@@ -61,7 +63,7 @@ export function AppSidebar({ isDark, toggleTheme }: AppSidebarProps) {
             </div>
           </div>
         )}
-        {collapsed && (
+        {isCollapsed && (
           <PieChart className="h-8 w-8 text-primary mx-auto" />
         )}
       </SidebarHeader>
@@ -76,7 +78,7 @@ export function AppSidebar({ isDark, toggleTheme }: AppSidebarProps) {
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} end className={getNavCls}>
                       <item.icon className="h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
+                      {!isCollapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -95,10 +97,10 @@ export function AppSidebar({ isDark, toggleTheme }: AppSidebarProps) {
             className="w-full"
           >
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            {!collapsed && <span className="ml-2">{isDark ? "Light" : "Dark"}</span>}
+            {!isCollapsed && <span className="ml-2">{isDark ? "Light" : "Dark"}</span>}
           </Button>
         </div>
-        {!collapsed && (
+        {!isCollapsed && (
           <div className="mt-2">
             <Button variant="ghost" size="sm" className="w-full justify-start">
               <Settings className="h-4 w-4" />
