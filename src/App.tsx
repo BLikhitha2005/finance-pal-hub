@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react"
 import { Toaster } from "@/components/ui/toaster"
 import { Toaster as Sonner } from "@/components/ui/sonner"
@@ -12,6 +11,7 @@ import { Transactions } from "./components/Transactions"
 import { BudgetPlanner } from "./components/BudgetPlanner"
 import { SavingsGoals } from "./components/SavingsGoals"
 import { Reports } from "./components/Reports"
+import { Settings } from "./components/Settings"
 import NotFound from "./pages/NotFound"
 
 const queryClient = new QueryClient()
@@ -65,6 +65,7 @@ const App = () => {
                     <Route path="/budget" element={<BudgetPlanner />} />
                     <Route path="/savings" element={<SavingsGoals />} />
                     <Route path="/reports" element={<Reports />} />
+                    <Route path="/settings" element={<Settings isDark={isDark} toggleTheme={toggleTheme} />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </main>

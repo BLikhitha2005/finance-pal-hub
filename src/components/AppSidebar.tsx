@@ -102,9 +102,11 @@ export function AppSidebar({ isDark, toggleTheme }: AppSidebarProps) {
         </div>
         {!isCollapsed && (
           <div className="mt-2">
-            <Button variant="ghost" size="sm" className="w-full justify-start">
-              <Settings className="h-4 w-4" />
-              <span className="ml-2">Settings</span>
+            <Button variant="ghost" size="sm" className="w-full justify-start" asChild>
+              <NavLink to="/settings">
+                <Settings className="h-4 w-4" />
+                <span className="ml-2">Settings</span>
+              </NavLink>
             </Button>
           </div>
         )}
